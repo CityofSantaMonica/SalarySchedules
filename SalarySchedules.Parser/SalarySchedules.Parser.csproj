@@ -44,9 +44,16 @@
   <ItemGroup>
     <Compile Include="FieldPatterns.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScheduleParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SalarySchedules.Models\SalarySchedules.Models.csproj">
+      <Project>{6893b4a0-74a7-48f7-9e5a-04e143e34ac1}</Project>
+      <Name>SalarySchedules.Models</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

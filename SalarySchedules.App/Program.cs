@@ -1,10 +1,6 @@
-﻿using iTextSharp.text.pdf;
-using iTextSharp.text.pdf.parser;
-using System;
+﻿using SalarySchedules.Models;
+using SalarySchedules.Parser;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SalarySchedules;
 
 namespace SalarySchedules.App
 {
@@ -18,37 +14,13 @@ namespace SalarySchedules.App
             }
 
             List<SalarySchedule> shedules = new List<SalarySchedule>();
+            ScheduleParser parser = new ScheduleParser();
 
             foreach (var file in args)
             {
-                
+                SalarySchedule schedule = parser.Process(file);
+                shedules.Add(schedule);
             }
-        }
-
-        static DateTime readReportDate(string file)
-        {
-            DateTime reportDate = DateTime.MinValue;
-
-            using (var reader = new PdfReader(file))
-            {
-                var pageContent 
-            }
-        }
-
-        static IEnumerable<string> readDataToText(string file)
-        {
-            List<string> content = new List<string>();
-
-            using (var reader = new PdfReader(file))
-            {
-                for (int i = 2; i <= reader.NumberOfPages; i++)
-                {
-                    var pageContent = PdfTextExtractor.GetTextFromPage(reader, i, new LocationTextExtractionStrategy());
-                    content.Add(pageContent);
-                }
-            }
-
-            return content;
         }
     }
 }
