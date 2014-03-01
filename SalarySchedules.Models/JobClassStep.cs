@@ -1,4 +1,4 @@
-﻿namespace SalarySchedule.Models
+﻿namespace SalarySchedules.Models
 {
     public class JobClassStep
     {

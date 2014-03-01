@@ -7,8 +7,8 @@
     <ProjectGuid>{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SalarySchedule.Models</RootNamespace>
-    <AssemblyName>SalarySchedule.Models</AssemblyName>
+    <RootNamespace>SalarySchedules.Models</RootNamespace>
+    <AssemblyName>SalarySchedules.Models</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

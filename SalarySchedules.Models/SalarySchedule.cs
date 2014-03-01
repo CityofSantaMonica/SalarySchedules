@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SalarySchedule.Models
+namespace SalarySchedules.Models
 {
     public class SalarySchedule
     {
