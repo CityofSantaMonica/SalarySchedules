@@ -39,6 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BargainingUnit.cs" />
+    <Compile Include="FiscalYear.cs" />
     <Compile Include="JobClass.cs" />
     <Compile Include="JobClassStep.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
