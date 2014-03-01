@@ -1,7 +1,31 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalarySchedules.App", "SalarySchedules.App\SalarySchedules.App.csproj", "{43F50D5E-A1E0-4C32-A666-986FECB9EFD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalarySchedules.Parser", "SalarySchedules.Parser\SalarySchedules.Parser.csproj", "{363C1F0E-92CD-40CF-BCAF-4D945193C145}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalarySchedules.Models", "SalarySchedules.Models\SalarySchedules.Models.csproj", "{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43F50D5E-A1E0-4C32-A666-986FECB9EFD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43F50D5E-A1E0-4C32-A666-986FECB9EFD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43F50D5E-A1E0-4C32-A666-986FECB9EFD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43F50D5E-A1E0-4C32-A666-986FECB9EFD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{363C1F0E-92CD-40CF-BCAF-4D945193C145}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{363C1F0E-92CD-40CF-BCAF-4D945193C145}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{363C1F0E-92CD-40CF-BCAF-4D945193C145}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{363C1F0E-92CD-40CF-BCAF-4D945193C145}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
