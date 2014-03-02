@@ -10,5 +10,12 @@ namespace SalarySchedules.Parser
             var strategy = new LocationTextExtractionStrategy();
             return PdfTextExtractor.GetTextFromPage(reader, pageNumber, strategy);
         }
+
+        public static void Swap<T>(T a, T b)
+        {
+            T temp = b;
+            b = a;
+            a = temp;
+        }
     }
 }
