@@ -78,9 +78,8 @@ namespace SalarySchedules.Parser
         IEnumerable<JobClass> readJobClasses(PdfReader reader)
         {
             // read every page beyond the first into an enumerable of strings (1 string for each such page).
-            var classesPages =
-                Enumerable.Range(2, reader.NumberOfPages - 1)
-                          .Select(page => PdfTextExtractor.GetTextFromPage(reader, page, new LocationTextExtractionStrategy()));
+            var classesPages = Enumerable.Range(2, reader.NumberOfPages - 1)
+                                         .Select(page => reader.TextFromPage(page));
 
             var jobClasses = new List<JobClass>();
 
@@ -111,7 +110,7 @@ namespace SalarySchedules.Parser
             //to process the chunks sequentially and
             //possibly consider more than one at a time,
             //we'll use a queue
-            var classData = new Queue<string>(fixAlignment(chunks));
+            var classData = new Queue<string>(fixRowAlignment(chunks));
 
             while (classData.Any())
             {
@@ -174,7 +173,7 @@ namespace SalarySchedules.Parser
         ///     032 5 3,057.69 38.22 6,625.00 79,500.00
         /// </example>
         /// <returns>Complete records for the fractured lines in <paramref name="chunks"/>.</returns>
-        IEnumerable<string> fixAlignment(IEnumerable<string> chunks)
+        IEnumerable<string> fixRowAlignment(IEnumerable<string> chunks)
         {
             List<string> final = new List<string>();
             Queue<string> queue = new Queue<string>(chunks);
