@@ -20,5 +20,14 @@ namespace SalarySchedules.Models
                     return String.Empty;
             }
         }
+
+        public FiscalYear(string startValue, string endValue)
+        {
+            string start = String.Format("07/01/{0}", startValue);
+            string end = String.Format("06/30/{0}", endValue);
+
+            StartDate = DateTime.Parse(start);
+            EndDate = DateTime.Parse(end);
+        }
     }
 }

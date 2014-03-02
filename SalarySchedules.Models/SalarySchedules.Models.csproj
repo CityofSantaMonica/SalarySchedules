@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BargainingUnit.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="FiscalYear.cs" />
     <Compile Include="JobClass.cs" />
     <Compile Include="JobClassStep.cs" />
