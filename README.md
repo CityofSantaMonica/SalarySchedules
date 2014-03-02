@@ -1,6 +1,6 @@
 #Salary Schedules
 
-The City of Santa Monica publishes [employee salary schedules] () in PDF format each fiscal year.
+The City of Santa Monica publishes [employee salary schedules] (http://www.smgov.net/Departments/HR/Employees/Employees.aspx) in PDF format each fiscal year.
 
 The aim of this project is to convert human-friendly PDF into machine-friendly JSON. 
 
