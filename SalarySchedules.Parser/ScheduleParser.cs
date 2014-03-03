@@ -31,6 +31,11 @@ namespace SalarySchedules.Parser
             return schedule;
         }
 
+        /// <summary>
+        /// Get a collection of normalized page data for each page in a file.
+        /// </summary>
+        /// <param name="filePath">The full path to the file to be read.</param>
+        /// <returns>An IEnumerable of IEnumerable of strings, representing the normalized lines of each page.</returns>
         public IEnumerable<IEnumerable<string>> GetAlignmentCorrectedData(string filePath)
         {
             byte[] fileData = File.ReadAllBytes(filePath);
@@ -44,6 +49,9 @@ namespace SalarySchedules.Parser
             return alignedPages;
         }
 
+        /// <summary>
+        /// Private implementation that acts on an open PdfReader.
+        /// </summary>
         private IEnumerable<IEnumerable<string>> getAlignmentCorrectedData(PdfReader reader)
         {
             return 
