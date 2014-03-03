@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using iTextSharp.text.pdf;
-using iTextSharp.text.pdf.parser;
 using SalarySchedules.Models;
 
 namespace SalarySchedules.Parser
