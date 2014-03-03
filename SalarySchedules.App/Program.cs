@@ -1,7 +1,7 @@
-﻿using SalarySchedules.Models;
-using SalarySchedules.Parser;
-using System.IO;
+﻿using System.IO;
 using System.Web.Script.Serialization;
+using SalarySchedules.Models;
+using SalarySchedules.Parser;
 
 namespace SalarySchedules.App
 {
