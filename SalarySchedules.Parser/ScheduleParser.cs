@@ -98,30 +98,31 @@ namespace SalarySchedules.Parser
         /// <returns>Complete records for the fractured lines in <paramref name="chunks"/>.</returns>
         IEnumerable<string> fixRowAlignment(IEnumerable<string> chunks)
         {
+            string replace = " ";
             List<string> final = new List<string>();
             Queue<string> queue = new Queue<string>(chunks);
-            bool clets = chunks.Any(s => s.Contains("CLETS Supervisor"));
+            bool flag = chunks.Any(s => s.Contains("Accounts Payable Super"));
 
             while (queue.Any())
             {
-                string current = queue.Dequeue();
+                string current = FieldPatterns.ConsecutiveSpaces.Replace(queue.Dequeue(), replace).Trim();
 
                 if (queue.Any())
                 {
-                    string next = queue.Peek();
+                    string next = queue.Peek().Trim();
 
                     if (FieldPatterns.ClassCode.IsMatch(current) && FieldPatterns.ClassTitle.IsMatch(next))
                     {
-                        current += " " + queue.Dequeue();
+                        current += " " + FieldPatterns.ConsecutiveSpaces.Replace(queue.Dequeue(), replace).Trim();
                     }
                     else if (FieldPatterns.Grade.IsMatch(current) && FieldPatterns.Rate.IsMatch(next)
                          && !FieldPatterns.ClassCode.IsMatch(next) && !FieldPatterns.Grade.IsMatch(next))
                     {
-                        current += " " + queue.Dequeue();
+                        current += " " + FieldPatterns.ConsecutiveSpaces.Replace(queue.Dequeue(), replace).Trim();
                     }
                 }
 
-                final.Add(current);
+                final.Add(current.Replace(" -", "-").Replace("- ", "-"));
             }
 
             return final;
@@ -179,29 +180,31 @@ namespace SalarySchedules.Parser
             //to process the chunks sequentially and
             //possibly consider more than one at a time,
             //we'll use a queue
-            var classData = new Queue<string>(page);
+            var pageQueue = new Queue<string>(page);
 
-            while (classData.Any())
+            while (pageQueue.Any())
             {
                 var jobClass = new JobClass();
                 var steps = new List<JobClassStep>();
                 var currentStep = new JobClassStep();
+                
+                IEnumerable<string> dataChunks = pageQueue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
                 //assign the title, code, bargaining unit, grade for this class
-                string data = assignClassDefinition(classData.Dequeue(), jobClass);
+                dataChunks = assignClassDefinition(dataChunks.ToList(), jobClass);
                 
                 //if there is leftover data -> step definition
-                if (!String.IsNullOrWhiteSpace(data))
-                    currentStep = assignStepData(data);
+                if (dataChunks.Any())
+                    currentStep = assignStepData(dataChunks);
 
                 if (currentStep.WellDefined)
                     steps.Add(currentStep);
                 
                 //add each subsequent step for this class
-                while (classData.Any() && classData.Peek().StartsWith(jobClass.Grade))
+                while (pageQueue.Any() && pageQueue.Peek().StartsWith(jobClass.Grade))
                 {
-                    data = classData.Dequeue().Substring(3);
-                    currentStep = assignStepData(data);
+                    dataChunks = pageQueue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Skip(1);
+                    currentStep = assignStepData(dataChunks);
                     
                     if (currentStep.WellDefined)
                         steps.Add(currentStep);
@@ -217,59 +220,73 @@ namespace SalarySchedules.Parser
         /// <summary>
         /// Consumes a line of data to populate a JobClass
         /// </summary>
-        /// <param name="data">A line containing job class data points.</param>
+        /// <param name="dataChunks">A collection of job class data points.</param>
         /// <param name="jobClass">A JobClass object to consume the line data.</param>
-        /// <returns>Any remaining data in the line after processing the JobClass.</returns>
-        string assignClassDefinition(string data, JobClass jobClass)
-        {
-            string replace = " ";
+        /// <returns>Any remaining data after processing the JobClass.</returns>
+        IEnumerable<string> assignClassDefinition(IList<string> dataChunks, JobClass jobClass)
+        {            
+            string code = dataChunks.FirstOrDefault(c => FieldPatterns.ClassCode.IsMatch(c));
+            if (!String.IsNullOrEmpty(code))
+            {
+                jobClass.Code = code;
+                dataChunks.Remove(code);
+            }
 
-            jobClass.Code = FieldPatterns.ClassCode.Match(data).Groups["value"].Value;
-            data = FieldPatterns.ClassCode.Replace(data, replace, 1);
+            string grade = dataChunks.FirstOrDefault(c => FieldPatterns.Grade.IsMatch(c));
+            if (!String.IsNullOrEmpty(grade))
+            {
+                jobClass.Grade = grade;
+                dataChunks.Remove(grade);
+            }
+            
+            string bu = dataChunks.FirstOrDefault(c => FieldPatterns.BargainingUnit.IsMatch(c));
+            if (!String.IsNullOrEmpty(bu))
+            {
+                jobClass.BargainingUnit = new BargainingUnit() {
+                    Code = bu
+                };
+                dataChunks.Remove(bu);
+            }
 
-            jobClass.Grade = FieldPatterns.Grade.Match(data).Groups["value"].Value;
-            data = FieldPatterns.Grade.Replace(data, replace, 1);
+            decimal dec;
+            var titleChunks = dataChunks.Where(c => !decimal.TryParse(c, out dec)).ToArray();
+            string title = String.Join(" ", titleChunks).Trim();
 
-            jobClass.BargainingUnit = new BargainingUnit() {
-                Code = FieldPatterns.BargainingUnit.Match(data).Groups["value"].Value
-            };
-            data = FieldPatterns.BargainingUnit.Replace(data, replace, 1);
+            if (!String.IsNullOrEmpty(title))
+            {
+                jobClass.Title = title;
+                foreach (var chunk in titleChunks)
+                {
+                    dataChunks.Remove(chunk);
+                }
+            }
 
-            jobClass.Title = FieldPatterns.ClassTitle.Match(data).Groups[0].Value.Trim();
-            data = FieldPatterns.ClassTitle.Replace(data, replace, 1);
-
-            return data;
+            return dataChunks;
         }
 
         /// <summary>
         /// Consumes a line of data to populate a JobClassStep
         /// </summary>
-        /// <param name="data">A line containing salary step data points.</param>
+        /// <param name="dataChunks">A collection of salary step data points.</param>
         /// <returns>A JobClassStep object representation of the data.</returns>
-        JobClassStep assignStepData(string data)
+        JobClassStep assignStepData(IEnumerable<string> dataChunks)
         {
             var step = new JobClassStep();
 
-            var rateMatches = 
-                FieldPatterns.Rate.Matches(data)
-                             .Cast<Match>()
-                             .Select(m => decimal.Parse(m.Groups[0].Value))
-                             .OrderBy(r => r);
-
-            if (rateMatches.Count() == 4)
+            if (dataChunks.Count() == 5)
             {
-                step.HourlyRate = rateMatches.First();
-                step.BiWeeklyRate = rateMatches.ElementAt(1);
-                step.MonthlyRate = rateMatches.ElementAt(2);
-                step.AnnualRate = rateMatches.Last();
+                var numberChunks = dataChunks.Select(d => decimal.Parse(d)).OrderBy(d => d);
+                step.StepNumber = (int)numberChunks.Min();
+                step.HourlyRate = numberChunks.First(d => d > step.StepNumber);
+                step.BiWeeklyRate = numberChunks.First(d => d > step.HourlyRate);
+                step.MonthlyRate = numberChunks.First(d => d > step.BiWeeklyRate);
+                step.AnnualRate = numberChunks.Max();
             }
             else
             {
-                throw new InvalidOperationException(String.Format("Couldn't parse rates in: {0}", data));
+                throw new InvalidOperationException(String.Format("Couldn't parse step data: {0}", String.Join(" ", dataChunks)));
             }
-
-            step.StepNumber = int.Parse(FieldPatterns.Step.Match(data).Groups[0].Value.Trim());
-            
+                        
             return step;
         }
     }
