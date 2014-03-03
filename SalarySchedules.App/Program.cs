@@ -1,6 +1,7 @@
 ﻿using SalarySchedules.Models;
 using SalarySchedules.Parser;
-using System.Collections.Generic;
+using System.IO;
+using System.Web.Script.Serialization;
 
 namespace SalarySchedules.App
 {
@@ -13,13 +14,14 @@ namespace SalarySchedules.App
                 return;
             }
 
-            List<SalarySchedule> shedules = new List<SalarySchedule>();
             ScheduleParser parser = new ScheduleParser();
+            JavaScriptSerializer serializer = new JavaScriptSerializer(); 
 
             foreach (var file in args)
             {
                 SalarySchedule schedule = parser.Process(file);
-                shedules.Add(schedule);
+                string json = serializer.Serialize(schedule);
+                File.WriteAllText(file.Replace(".pdf", ".json"), json);
             }
         }
     }
