@@ -17,21 +17,18 @@ namespace SalarySchedules.Parser
             new Regex(@"[a-z\./&-]+ ([a-z\./&\(\) -])+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static Regex ClassCode =
-            new Regex(@"(^(?<code>[0-9]{4})|\s+(?<code>[0-9]{4}))\s*", RegexOptions.Compiled);
+            new Regex(@"(^(?<value>[0-9]{4})|\s+(?<value>[0-9]{4}))\s?", RegexOptions.Compiled);
 
         public static Regex BargainingUnit =
-            new Regex(@"\s([A-Z]{3})", RegexOptions.Compiled);
+            new Regex(@"\s?(?<value>[A-Z]{3})\s?", RegexOptions.Compiled);
 
         public static Regex Grade =
-            new Regex(@"((^[0-9]{3})|(\s[0-9]{3}))\s+", RegexOptions.Compiled);
+            new Regex(@"(^(?<value>[0-9]{3})|\s+(?<value>[0-9]{3}))\s?", RegexOptions.Compiled);
 
         public static Regex Step =
-            new Regex(@"\s*([1-5])\s*", RegexOptions.Compiled);
+            new Regex(@"\s?(?<value>[1-5])\s?", RegexOptions.Compiled);
 
         public static Regex Rate =
-            new Regex(@"\s[0-9,]{1,}\.[0-9]{2}", RegexOptions.Compiled);
-
-        public static Regex ConsecutiveSpaces =
-            new Regex(@"\s{2,}", RegexOptions.Compiled);
+            new Regex(@"\s?(?<value>[0-9,]{1,}\.[0-9]{2})\s?", RegexOptions.Compiled);
     }
 }

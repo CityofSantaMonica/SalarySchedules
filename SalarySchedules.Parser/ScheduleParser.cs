@@ -49,7 +49,7 @@ namespace SalarySchedules.Parser
         private IEnumerable<IEnumerable<string>> getAlignmentCorrectedData(PdfReader reader)
         {
             return 
-                Enumerable.Range(2, reader.NumberOfPages)
+                Enumerable.Range(2, reader.NumberOfPages - 1)
                           .Select(n => reader.TextFromPage(n))
                           .Select(page => getPageChunks(page))
                           .Select(chunks => fixRowAlignment(chunks))
@@ -200,16 +200,11 @@ namespace SalarySchedules.Parser
                 //add each subsequent step for this class
                 while (classData.Any() && classData.Peek().StartsWith(jobClass.Grade))
                 {
-                    currentStep = assignStepData(classData.Dequeue());
+                    data = classData.Dequeue().Substring(3);
+                    currentStep = assignStepData(data);
                     
                     if (currentStep.WellDefined)
                         steps.Add(currentStep);
-                }
-
-                //the step numbers are getting all screwed up
-                foreach (var step in steps)
-                {
-                    step.StepNumber = steps.IndexOf(step) + 1;
                 }
 
                 jobClass.Steps = steps;
@@ -227,22 +222,21 @@ namespace SalarySchedules.Parser
         /// <returns>Any remaining data in the line after processing the JobClass.</returns>
         string assignClassDefinition(string data, JobClass jobClass)
         {
-            string code = FieldPatterns.ClassCode.Match(data).Groups[0].Value;
-            jobClass.Code = FieldPatterns.ConsecutiveSpaces.Replace(code, " ").Trim();
-            data = FieldPatterns.ClassCode.Replace(data, string.Empty, 1);
+            string replace = " ";
 
-            string grade = FieldPatterns.Grade.Match(data).Groups[0].Value;
-            jobClass.Grade = FieldPatterns.ConsecutiveSpaces.Replace(grade, " ").Trim();
-            data = FieldPatterns.Grade.Replace(data, string.Empty, 1);
+            jobClass.Code = FieldPatterns.ClassCode.Match(data).Groups["value"].Value;
+            data = FieldPatterns.ClassCode.Replace(data, replace, 1);
 
-            jobClass.BargainingUnit = new BargainingUnit();
-            code = FieldPatterns.BargainingUnit.Match(data).Groups[0].Value;
-            jobClass.BargainingUnit.Code = FieldPatterns.ConsecutiveSpaces.Replace(code, " ").Trim();
-            data = FieldPatterns.BargainingUnit.Replace(data, string.Empty, 1);
+            jobClass.Grade = FieldPatterns.Grade.Match(data).Groups["value"].Value;
+            data = FieldPatterns.Grade.Replace(data, replace, 1);
 
-            string title = FieldPatterns.ClassTitle.Match(data).Groups[0].Value;
-            jobClass.Title = FieldPatterns.ConsecutiveSpaces.Replace(title, " ").Trim();
-            data = FieldPatterns.ClassTitle.Replace(data, string.Empty, 1);
+            jobClass.BargainingUnit = new BargainingUnit() {
+                Code = FieldPatterns.BargainingUnit.Match(data).Groups["value"].Value
+            };
+            data = FieldPatterns.BargainingUnit.Replace(data, replace, 1);
+
+            jobClass.Title = FieldPatterns.ClassTitle.Match(data).Groups[0].Value.Trim();
+            data = FieldPatterns.ClassTitle.Replace(data, replace, 1);
 
             return data;
         }
@@ -256,10 +250,11 @@ namespace SalarySchedules.Parser
         {
             var step = new JobClassStep();
 
-            var rateMatches = FieldPatterns.Rate.Matches(data)
-                                                .Cast<Match>()
-                                                .Select(m => decimal.Parse(m.Groups[0].Value))
-                                                .OrderBy(r => r);
+            var rateMatches = 
+                FieldPatterns.Rate.Matches(data)
+                             .Cast<Match>()
+                             .Select(m => decimal.Parse(m.Groups[0].Value))
+                             .OrderBy(r => r);
 
             if (rateMatches.Count() == 4)
             {
