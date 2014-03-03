@@ -7,6 +7,7 @@ namespace SalarySchedules.Models
     {
         public DateTime? ReportRunDate { get; set; }
         public FiscalYear FiscalYear { get; set; }
-        public IEnumerable<JobClass> JobClasses { get; set; }
+        public IEnumerable<BargainingUnit> BargainingUnits { get; set; }
+        public IEnumerable<JobClass> JobClasses { get; set; }        
     }
 }

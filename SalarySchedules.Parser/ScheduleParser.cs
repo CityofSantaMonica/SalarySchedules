@@ -4,11 +4,14 @@ using System.IO;
 using System.Linq;
 using iTextSharp.text.pdf;
 using SalarySchedules.Models;
+using System.Text.RegularExpressions;
 
 namespace SalarySchedules.Parser
 {
     public class ScheduleParser
     {
+        Dictionary<string, string> bargainingUnitNames;
+
         /// <summary>
         /// Create a SalarySchedule object graph from a salary schedule PDF.
         /// </summary>
@@ -23,27 +26,29 @@ namespace SalarySchedules.Parser
             {
                 schedule.FiscalYear = readFiscalYear(reader);
                 schedule.ReportRunDate = readReportDate(reader);
-                
+
+                schedule.BargainingUnits = readBargainingUnits(reader);
+
                 schedule.JobClasses = 
-                    getAlignmentCorrectedData(reader).SelectMany(page => processPage(page)).ToArray();
+                    getAlignmentCorrectedClassData(reader).SelectMany(page => processClassesOnPage(page)).ToArray();
             }
 
             return schedule;
         }
-
+        
         /// <summary>
         /// Get a collection of normalized page data for each page in a file.
         /// </summary>
         /// <param name="filePath">The full path to the file to be read.</param>
         /// <returns>An IEnumerable of IEnumerable of strings, representing the normalized lines of each page.</returns>
-        public IEnumerable<IEnumerable<string>> GetAlignmentCorrectedData(string filePath)
+        public IEnumerable<IEnumerable<string>> GetAlignmentCorrectedClassData(string filePath)
         {
             byte[] fileData = File.ReadAllBytes(filePath);
             IEnumerable<IEnumerable<string>> alignedPages = null;
             
             using (var reader = new PdfReader(fileData))
             {
-                alignedPages = getAlignmentCorrectedData(reader);
+                alignedPages = getAlignmentCorrectedClassData(reader);
             }
 
             return alignedPages;
@@ -52,13 +57,13 @@ namespace SalarySchedules.Parser
         /// <summary>
         /// Private implementation that acts on an open PdfReader.
         /// </summary>
-        private IEnumerable<IEnumerable<string>> getAlignmentCorrectedData(PdfReader reader)
+        private IEnumerable<IEnumerable<string>> getAlignmentCorrectedClassData(PdfReader reader)
         {
             return 
                 Enumerable.Range(2, reader.NumberOfPages - 1)
                           .Select(n => reader.TextFromPage(n))
                           .Select(page => getPageChunks(page))
-                          .Select(chunks => fixRowAlignment(chunks))
+                          .Select(chunks => fixAlignment(chunks))
                           .ToArray();
         }
 
@@ -102,7 +107,7 @@ namespace SalarySchedules.Parser
         ///     032 5 3,057.69 38.22 6,625.00 79,500.00
         /// </example>
         /// <returns>Complete records for the fractured lines in <paramref name="chunks"/>.</returns>
-        IEnumerable<string> fixRowAlignment(IEnumerable<string> chunks)
+        IEnumerable<string> fixAlignment(IEnumerable<string> chunks)
         {
             string replace = " ";
             List<string> final = new List<string>();
@@ -173,18 +178,49 @@ namespace SalarySchedules.Parser
             else
                 return null;
         }
-        
+
+        /// <summary>
+        /// Reads the Bargaining Unit information on the first page of the report.
+        /// </summary>
+        /// <returns>A collection BargainingUnit objects for this report.</returns>
+        IEnumerable<BargainingUnit> readBargainingUnits(PdfReader reader)
+        {
+            string replace = " ";
+            var units = new List<BargainingUnit>();
+            var text = reader.TextFromPage(1).Replace("Fire ", "FIR ");
+            var chunks = getPageChunks(text).Where(c => FieldPatterns.BargainingUnit.IsMatch(c));
+            
+            foreach (var chunk in chunks)
+            {
+                var matches = FieldPatterns.BargainingUnit.Matches(chunk);
+
+                var names = FieldPatterns.BargainingUnit.Split(chunk)
+                                                        .Where(s => !String.IsNullOrEmpty(s.Trim()))
+                                                        .Select(s => FieldPatterns.ConsecutiveSpaces.Replace(s, replace).Trim());
+                for (int i = 0; i < matches.Count; i++)
+                {
+                    var match = matches[i];
+
+                    if(!units.Any(bu => bu.Code == match.Value))
+                        units.Add(new BargainingUnit() { Code = match.Value, Name = names.ElementAt(i) });
+                }
+            }
+
+            bargainingUnitNames = units.ToDictionary(bu => bu.Code, bu => bu.Name);
+
+            return units;
+        }
+
         /// <summary>
         /// Process the job classes on a single page.
         /// </summary>
         /// <param name="page">The textual data of a single page, broken by newline and realigned.</param>
         /// <returns>A collection of JobClass objects from the page.</returns>
-        IEnumerable<JobClass> processPage(IEnumerable<string> page)
+        IEnumerable<JobClass> processClassesOnPage(IEnumerable<string> page)
         {
             var jobClasses = new List<JobClass>();
             
-            //to process the chunks sequentially and
-            //possibly consider more than one at a time,
+            //to process the chunks sequentially (considering more than one at a time),
             //we'll use a queue
             var pageQueue = new Queue<string>(page);
 
@@ -197,23 +233,21 @@ namespace SalarySchedules.Parser
                 IEnumerable<string> dataChunks = pageQueue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
                 //assign the title, code, bargaining unit, grade for this class
-                dataChunks = assignClassDefinition(dataChunks.ToList(), jobClass);
+                dataChunks = assignClassData(dataChunks.ToList(), jobClass);
                 
                 //if there is leftover data -> step definition
                 if (dataChunks.Any())
+                {
                     currentStep = assignStepData(dataChunks);
-
-                if (currentStep.WellDefined)
                     steps.Add(currentStep);
-                
+                }
+                    
                 //add each subsequent step for this class
                 while (pageQueue.Any() && pageQueue.Peek().StartsWith(jobClass.Grade))
                 {
                     dataChunks = pageQueue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Skip(1);
                     currentStep = assignStepData(dataChunks);
-                    
-                    if (currentStep.WellDefined)
-                        steps.Add(currentStep);
+                    steps.Add(currentStep);
                 }
 
                 jobClass.Steps = steps;
@@ -229,7 +263,7 @@ namespace SalarySchedules.Parser
         /// <param name="dataChunks">A collection of job class data points.</param>
         /// <param name="jobClass">A JobClass object to consume the line data.</param>
         /// <returns>Any remaining data after processing the JobClass.</returns>
-        IEnumerable<string> assignClassDefinition(IList<string> dataChunks, JobClass jobClass)
+        IEnumerable<string> assignClassData(IList<string> dataChunks, JobClass jobClass)
         {            
             string code = dataChunks.FirstOrDefault(c => FieldPatterns.ClassCode.IsMatch(c));
             if (!String.IsNullOrEmpty(code))
@@ -249,7 +283,8 @@ namespace SalarySchedules.Parser
             if (!String.IsNullOrEmpty(bu))
             {
                 jobClass.BargainingUnit = new BargainingUnit() {
-                    Code = bu
+                    Code = bu,
+                    Name = bargainingUnitName(bu)
                 };
                 dataChunks.Remove(bu);
             }
@@ -268,6 +303,17 @@ namespace SalarySchedules.Parser
             }
 
             return dataChunks;
+        }
+
+        /// <summary>
+        /// Gets the full name of the bargaining unit for the given code.
+        /// </summary>
+        string bargainingUnitName(string code)
+        {
+            if (bargainingUnitNames != null)
+                if (bargainingUnitNames.ContainsKey(code))
+                    return bargainingUnitNames[code];
+            return string.Empty;
         }
 
         /// <summary>
