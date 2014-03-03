@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SalarySchedules.Models
 {
-    public class JobClass
+    public class JobClass : IJobClass
     {
         public string Title { get; set; }
         public string Code { get; set; }

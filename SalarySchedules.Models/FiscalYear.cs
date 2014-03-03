@@ -21,6 +21,8 @@ namespace SalarySchedules.Models
             }
         }
 
+        public FiscalYear() { }
+
         public FiscalYear(string startValue, string endValue)
         {
             string start = String.Format("07/01/{0}", startValue);

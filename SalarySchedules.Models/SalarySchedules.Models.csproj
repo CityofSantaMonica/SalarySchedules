@@ -36,6 +36,8 @@
   <ItemGroup>
     <Compile Include="BargainingUnit.cs" />
     <Compile Include="FiscalYear.cs" />
+    <Compile Include="IJobClass.cs" />
+    <Compile Include="ISalarySchedule.cs" />
     <Compile Include="JobClass.cs" />
     <Compile Include="JobClassStep.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

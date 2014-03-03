@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalarySchedules.Parser", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalarySchedules.Models", "SalarySchedules.Models\SalarySchedules.Models.csproj", "{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalarySchedules.Web", "SalarySchedules.Web\SalarySchedules.Web.csproj", "{203BD124-577D-4FC9-A9C7-1A517322CBA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{203BD124-577D-4FC9-A9C7-1A517322CBA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{203BD124-577D-4FC9-A9C7-1A517322CBA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{203BD124-577D-4FC9-A9C7-1A517322CBA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{203BD124-577D-4FC9-A9C7-1A517322CBA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
