@@ -41,10 +41,10 @@ var templates = {
 
     "bargainingUnit": $("<tr />").append($("<td />").addClass("code")).append($("<td />").addClass("name")),
 
-    "step": $("<tr>").append($("<td />").addClass("hourly"))
-                     .append($("<td />").addClass("biweekly"))
-                     .append($("<td />").addClass("monthly"))
-                     .append($("<td />").addClass("annual"))
+    "step": $("<tr>").append($("<td />").addClass("hourly rate"))
+                     .append($("<td />").addClass("biweekly rate"))
+                     .append($("<td />").addClass("monthly rate"))
+                     .append($("<td />").addClass("annual rate"))
 };
 
 $(function () {
@@ -115,10 +115,10 @@ $(function () {
 
             $.each(jobClassData.Steps, function (j, stepData) {
                 var $step = templates.step.clone();
-                $(".hourly", $step).text(stepData.HourlyRate);
-                $(".biweekly", $step).text(stepData.BiWeeklyRate);
-                $(".monthly", $step).text(stepData.MonthlyRate);
-                $(".annual", $step).text(stepData.AnnualRate);
+                $(".hourly", $step).text(stepData.HourlyRate.toFixed(2));
+                $(".biweekly", $step).text(stepData.BiWeeklyRate.toFixed(2));
+                $(".monthly", $step).text(stepData.MonthlyRate.toFixed(2));
+                $(".annual", $step).text(stepData.AnnualRate.toFixed(2));
                 $steps.append($step);
             });
 

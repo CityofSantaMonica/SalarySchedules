@@ -6,4 +6,6 @@
 
 .jobClass .steps { clear: left; }
 
+.jobClass .steps .rate::before { content: '$'; }
+
 .table { margin-bottom: 0; }

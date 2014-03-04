@@ -53,7 +53,6 @@
     <Content Include="Default.aspx" />
     <Content Include="img\glyphicons-halflings-white.png" />
     <Content Include="img\glyphicons-halflings.png" />
-    <Content Include="js\resizing.js" />
     <Content Include="js\salarySchedules.js" />
     <Content Include="SalaryScheduleService.asmx" />
     <Content Include="Web.config" />
@@ -88,7 +87,6 @@
     <Content Include="Resources\salary-sched-11-12.pdf" />
     <Content Include="Resources\salary-sched-13-14.pdf" />
     <Content Include="Site.Master" />
-    <Content Include="js\ko.models.js" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
