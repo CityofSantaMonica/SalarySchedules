@@ -1,0 +1,9 @@
+﻿.jobClass { border: solid 1px #efefef; }
+
+.jobClass h4 { margin-top: 0; background-color: #428BCA; color: #fff; padding: 10px; }
+
+.jobClass span { float: left; margin-right: 1em; font-weight: bold; }
+
+.jobClass .steps { clear: left; }
+
+.table { margin-bottom: 0; }

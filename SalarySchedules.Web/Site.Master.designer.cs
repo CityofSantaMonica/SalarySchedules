@@ -10,36 +10,42 @@
 namespace SalarySchedules.Web {
     
     
-    public partial class Default {
+    public partial class Site_Master {
         
         /// <summary>
-        /// YearLabel control.
+        /// HeadContentPlaceHolder control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label YearLabel;
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder HeadContentPlaceHolder;
         
         /// <summary>
-        /// YearSelect control.
+        /// Form control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList YearSelect;
+        protected global::System.Web.UI.HtmlControls.HtmlForm Form;
         
         /// <summary>
-        /// Master property.
+        /// MainContentPlaceHolder control.
         /// </summary>
         /// <remarks>
-        /// Auto-generated property.
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        public new SalarySchedules.Web.Site_Master Master {
-            get {
-                return ((SalarySchedules.Web.Site_Master)(base.Master));
-            }
-        }
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContentPlaceHolder;
+        
+        /// <summary>
+        /// ScriptContentPlaceHolder control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder ScriptContentPlaceHolder;
     }
 }

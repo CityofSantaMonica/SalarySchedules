@@ -40,13 +40,21 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="css\styles.css" />
     <Content Include="Default.aspx" />
+    <Content Include="img\glyphicons-halflings-white.png" />
+    <Content Include="img\glyphicons-halflings.png" />
+    <Content Include="js\resizing.js" />
+    <Content Include="js\salarySchedules.js" />
     <Content Include="SalaryScheduleService.asmx" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -66,12 +74,21 @@
       <DependentUpon>SalaryScheduleService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Site.Master.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Site.Master.designer.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\salary-sched-09-10.pdf" />
     <Content Include="Resources\salary-sched-10-11.pdf" />
     <Content Include="Resources\salary-sched-11-12.pdf" />
-    <Content Include="Resources\salary-sched-12-13.pdf" />
+    <Content Include="Resources\salary-sched-13-14.pdf" />
+    <Content Include="Site.Master" />
+    <Content Include="js\ko.models.js" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -89,6 +106,7 @@
       <Name>SalarySchedules.Parser</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
