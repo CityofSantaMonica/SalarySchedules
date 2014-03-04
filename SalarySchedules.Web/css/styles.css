@@ -1,11 +1,17 @@
-﻿.jobClass { border: solid 1px #efefef; }
+﻿.jobClasses .sizer { width: 21%; }
+
+.jobClass { border: solid 1px #efefef; margin-bottom: 10px; width: 350px; }
+
+.jobClass div.description { padding-left: 10px; }
 
 .jobClass h4 { margin-top: 0; background-color: #428BCA; color: #fff; padding: 10px; }
 
 .jobClass span { float: left; margin-right: 1em; font-weight: bold; }
 
-.jobClass .steps { clear: left; }
+.jobClass .steps { clear: left; padding-top: 10px; }
 
 .jobClass .steps .rate::before { content: '$'; }
+
+thead td { font-weight: bold; }
 
 .table { margin-bottom: 0; }

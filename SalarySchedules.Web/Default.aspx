@@ -22,5 +22,6 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" runat="server" ContentPlaceHolderID="ScriptContentPlaceHolder">
+    <script src="js/masonry.pkgd.min.js"></script>
     <script src="js/salarySchedules.js"></script>
 </asp:Content>

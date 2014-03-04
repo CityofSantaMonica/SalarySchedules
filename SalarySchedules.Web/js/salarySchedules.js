@@ -28,14 +28,15 @@
 };
 
 var templates = {
-    "jobClasses": $("<div />"),
+    "jobClasses": $("<div />").addClass("jobClasses").append($("<div />").addClass("sizer")),
 
     "jobClass": $("<div />").addClass("jobClass")
                             .append($("<h4 />"))
-                            .append($("<span />").addClass("code"))
-                            .append($("<span />").addClass("grade"))
-                            .append($("<span />").addClass("bargainingUnit"))
-                            .append($("<div />").addClass("steps table-responsive")),
+                            .append($("<div />").addClass("description")
+                                .append($("<span />").addClass("code"))
+                                .append($("<span />").addClass("grade"))
+                                .append($("<span />").addClass("bargainingUnit")))
+                            .append($("<div />").addClass("steps")),
 
     "table": $("<table />").addClass("table table-striped table-bordered"),
 
@@ -63,10 +64,11 @@ $(function () {
         e.preventDefault();
     });
 
-    var rebind = function (data, pre) {
+    var rebind = function (data, bu, pre) {
         $target.empty();
+        $target.append($("<h3 />").text("FY " + data.FiscalYear.ShortSpanCode));
         bindBargainingUnits(data);
-        var $jobClasses = bindJobClasses(data, pre);
+        var $jobClasses = bindJobClasses(data, bu, pre);
         return $jobClasses;
     };
 
@@ -78,12 +80,8 @@ $(function () {
 
         $.each(data.BargainingUnits, function (i, bu) {
             var $unit = templates.bargainingUnit.clone(),
-                $code = $a.clone().on("click", function () {
-                    rebind(data, function (index) {
-                        return !(this.BargainingUnit === undefined || this.BargainingUnit === null)
-                            &&  (this.BargainingUnit.Code === bu.Code);
-                    });
-                }).attr("href", "#").text(bu.Code);
+                $code = $a.clone().on("click", function () { rebind(data, bu.Code); }).attr("href", "#").text(bu.Code);
+
             $(".code", $unit).html($code);
             $(".name", $unit).text(bu.Name);
             $units.append($unit);
@@ -92,14 +90,17 @@ $(function () {
         $target.append($("<div />").addClass("table-responsive").append($units));
     };
 
-    var bindJobClasses = function (data, pre) {
+    var bindJobClasses = function (data, bu) {
         var jobClassesData = data.JobClasses;
 
-        if (pre) {
-            jobClassesData = $(data.JobClasses).filter(pre);
+        if (bu) {
+            jobClassesData = $(data.JobClasses).filter(function (i) {
+                return !(this.BargainingUnit === undefined || this.BargainingUnit === null)
+                           && (this.BargainingUnit.Code === bu);
+            });
         }
 
-        $target.append($("<h3 />").text("Job Classes" + (pre ? " (filtered)" : "")));
+        $target.append($("<h3 />").text("Job Classes" + (bu ? " (" + bu + ")" : "")));
 
         var $jobClasses = templates.jobClasses.clone();
 
@@ -111,7 +112,7 @@ $(function () {
             $(".grade", $jobClass).text("Grade: " + jobClassData.Grade);
             $(".bargainingUnit", $jobClass).text("BU: " + (jobClassData.BargainingUnit ? jobClassData.BargainingUnit.Code : "N/A"));
 
-            var $steps = templates.table.clone();
+            var $steps = templates.table.clone().append($("<thead><tr><td>Hourly</td><td>BiWeekly</td><td>Monthly</td><td>Annually</td></tr></thead>"));
 
             $.each(jobClassData.Steps, function (j, stepData) {
                 var $step = templates.step.clone();
@@ -128,6 +129,13 @@ $(function () {
         });
 
         $target.append($jobClasses);
+        
+        $jobClasses.masonry({
+            columnWidth: ".sizer",
+            itemSelector: ".jobClass",
+            gutter: 5,
+            isFitWidth: true
+        });
 
         return $jobClasses;
     };
