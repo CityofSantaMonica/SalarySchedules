@@ -14,7 +14,7 @@ namespace SalarySchedules.App
                 return;
             }
 
-            ScheduleParser parser = new ScheduleParser();
+            CSMScheduleParser parser = new CSMScheduleParser();
             JavaScriptSerializer serializer = new JavaScriptSerializer(); 
 
             foreach (var file in args)

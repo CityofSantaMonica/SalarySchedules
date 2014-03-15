@@ -15,7 +15,7 @@ namespace SalarySchedules.Web
         public SalaryScheduleDTO GetSchedule(string file)
         {
             var serverFile = HttpContext.Current.Server.MapPath(string.Format("~/Resources/{0}", file));
-            var parser = new ScheduleParser();
+            var parser = new CSMScheduleParser();
             var schedule = parser.Process(serverFile);
             var dto = ((ISalarySchedule)schedule).ToDTO();
             return dto;
