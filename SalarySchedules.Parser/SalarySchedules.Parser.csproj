@@ -41,7 +41,7 @@
     <Compile Include="FieldPatterns.cs" />
     <Compile Include="ISalaryScheduleParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScheduleParser.cs" />
+    <Compile Include="CSMSalaryScheduleParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

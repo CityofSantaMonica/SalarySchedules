@@ -10,7 +10,7 @@ namespace SalarySchedules.Parser
     /// <summary>
     /// SalaryScheduleParser implementation for the City of Santa Monica.
     /// </summary>
-    public class CSMScheduleParser : ISalaryScheduleParser
+    public class CSMSalaryScheduleParser : ISalaryScheduleParser
     {
         Dictionary<string, BargainingUnit> bargainingUnits;
         

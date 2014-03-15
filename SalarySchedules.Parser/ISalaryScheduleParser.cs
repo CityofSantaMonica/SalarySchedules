@@ -9,6 +9,6 @@ namespace SalarySchedules.Parser
         /// </summary>
         /// <param name="filePath">Full file path to a (readable) salary schedule file.</param>
         /// <returns>The SalarySchedule object representation of the given file.</returns>
-        public SalarySchedule Process(string filePath);
+        public ISalarySchedule Process(string filePath);
     }
 }

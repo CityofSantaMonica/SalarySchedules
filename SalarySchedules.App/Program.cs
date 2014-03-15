@@ -14,12 +14,12 @@ namespace SalarySchedules.App
                 return;
             }
 
-            CSMScheduleParser parser = new CSMScheduleParser();
+            ISalaryScheduleParser parser = new CSMSalaryScheduleParser();
             JavaScriptSerializer serializer = new JavaScriptSerializer(); 
 
             foreach (var file in args)
             {
-                SalarySchedule schedule = parser.Process(file);
+                ISalarySchedule schedule = parser.Process(file);
                 string json = serializer.Serialize(schedule);
                 File.WriteAllText(file.Replace(".pdf", ".json"), json);
             }
