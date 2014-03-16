@@ -8,7 +8,7 @@ using SalarySchedules.Models;
 namespace SalarySchedules.Parser
 {
     /// <summary>
-    /// SalaryScheduleParser implementation for the City of Santa Monica.
+    /// ISalaryScheduleParser implementation for the City of Santa Monica.
     /// </summary>
     public class CSMSalaryScheduleParser : ISalaryScheduleParser
     {
@@ -18,10 +18,10 @@ namespace SalarySchedules.Parser
         /// Process a Salary Schedule Report PDF.
         /// </summary>
         /// <param name="pdfPath">Full path to a readable salary schedule report PDF.</param>
-        /// <returns>A <c>SalarySchedule</c> representation of the report data.</returns>
-        public SalarySchedule Process(string pdfPath) 
+        /// <returns>An <c>ISalarySchedule</c> representation of the report data.</returns>
+        public ISalarySchedule Process(string pdfPath) 
         {
-            var schedule = new SalarySchedule();
+            ISalarySchedule schedule = new SalarySchedule();
             byte[] fileData = File.ReadAllBytes(pdfPath);
 
             using (var reader = new PdfReader(fileData))
