@@ -1,102 +1,92 @@
-﻿function SalaryScheduleApp($target) {
-    //some local variables and functions
-    var jobClasses = [],
-        templates = {
-            jobClasses: $("<div />").addClass("jobClasses").append($("<div />").addClass("sizer")),
+﻿function SalaryScheduleApp() {
 
-            jobClass: $("<div />").addClass("jobClass")
-                                    .append($("<h4 />"))
-                                    .append($("<div />").addClass("description")
-                                        .append($("<span />").addClass("code"))
-                                        .append($("<span />").addClass("grade"))
-                                        .append($("<span />").addClass("bargainingUnit")))
-                                    .append($("<div />").addClass("steps")),
+    //knockout view models
 
-            table: $("<table />").addClass("table table-striped table-bordered"),
+    function salaryScheduleViewModel(data) {
+        var self = this;
+        var allJobClasses = $.extend(true, [], data.JobClasses);
 
-            bargainingUnit: $("<tr />").append($("<td />").addClass("code")).append($("<td />").addClass("name")),
+        self.ReportRunDate = ko.observable(data.ReportRunDate);
+        self.FiscalYear = ko.observable(data.FiscalYear);
+        self.FiscalYearLabel = ko.computed(function () {
+            return "FY " + self.FiscalYear().ShortSpanCode;
+        }, self);
 
-            step: $("<tr>").append($("<td />").addClass("hourly rate"))
-                           .append($("<td />").addClass("biweekly rate"))
-                           .append($("<td />").addClass("monthly rate"))
-                           .append($("<td />").addClass("annual rate"))
-        },
-        filterJobClasses = function (filterFunc) {
-            return $(jobClasses).filter(filterFunc);
-        },
-        rebind = function (data, bu, pre) {
-            $target.empty();
-            $target.append($("<h3 />").text("FY " + data.FiscalYear.ShortSpanCode));
-            bindBargainingUnits(data);
-            var $jobClasses = bindJobClasses(data, bu, pre);
-            return $jobClasses;
-        },
-        bindBargainingUnits = function (data) {
-            $target.append($("<h3 />").text("Bargaining Units"));
+        self.BargainingUnits = ko.observableArray();
 
-            var $units = templates.table.clone(),
-                $a = $("<a />");
-
-            $.each(data.BargainingUnits, function (i, bu) {
-                var $unit = templates.bargainingUnit.clone(),
-                    $code = $a.clone().on("click", function () { rebind(data, bu.Code); }).attr("href", "#").text(bu.Code);
-
-                $(".code", $unit).html($code);
-                $(".name", $unit).text(bu.Name);
-                $units.append($unit);
+        self.JobClasses = ko.observableArray();
+        self.FilterByBargainingUnit = function (bu) {
+            var filteredClasses = $(allJobClasses).filter(function () {
+                return !(this.BargainingUnit === undefined || this.BargainingUnit === null)
+                               && (this.BargainingUnit.Code === bu.Code);
             });
-
-            $target.append($("<div />").addClass("table-responsive").append($units));
-        },
-        bindJobClasses = function (data, bu) {
-            var jobClassesData = data.JobClasses;
-
-            if (bu) {
-                jobClassesData = $(data.JobClasses).filter(function (i) {
-                    return !(this.BargainingUnit === undefined || this.BargainingUnit === null)
-                               && (this.BargainingUnit.Code === bu);
-                });
-            }
-
-            $target.append($("<h3 />").text("Job Classes" + (bu ? " (" + bu + ")" : "")));
-
-            var $jobClasses = templates.jobClasses.clone();
-
-            $.each(jobClassesData, function (i, jobClassData) {
-                var $jobClass = templates.jobClass.clone();
-
-                $("h4", $jobClass).text(jobClassData.Title);
-                $(".code", $jobClass).text("Code: " + jobClassData.Code);
-                $(".grade", $jobClass).text("Grade: " + jobClassData.Grade);
-                $(".bargainingUnit", $jobClass).text("BU: " + (jobClassData.BargainingUnit ? jobClassData.BargainingUnit.Code : "N/A"));
-
-                var $steps = templates.table.clone().append($("<thead><tr><td>Hourly</td><td>BiWeekly</td><td>Monthly</td><td>Annually</td></tr></thead>"));
-
-                $.each(jobClassData.Steps, function (j, stepData) {
-                    var $step = templates.step.clone();
-                    $(".hourly", $step).text(stepData.HourlyRate.toFixed(2));
-                    $(".biweekly", $step).text(stepData.BiWeeklyRate.toFixed(2));
-                    $(".monthly", $step).text(stepData.MonthlyRate.toFixed(2));
-                    $(".annual", $step).text(stepData.AnnualRate.toFixed(2));
-                    $steps.append($step);
-                });
-
-                $(".steps", $jobClass).append($steps);
-
-                $jobClasses.append($jobClass);
-            });
-
-            $target.append($jobClasses);
-
-            $jobClasses.masonry({
-                columnWidth: ".sizer",
-                itemSelector: ".jobClass",
-                gutter: 5,
-                isFitWidth: true
-            });
-
-            return $jobClasses;
+            self.JobClasses(filteredClasses);
         };
+    };
+
+    function jobClassViewModel(jobClassData) {
+        var self = this;
+        var mapping = {
+            "Steps": {
+                create: function (options) {
+                    return new jobClassStepViewModel(options.data);
+                }
+            }
+        };
+
+        ko.mapping.fromJS(jobClassData, mapping, self);
+
+        self.CodeLabel = ko.computed(function () {
+            return "Code: " + self.Code();
+        });
+        self.GradeLabel = ko.computed(function () {
+            return "Grade: " + self.Grade();
+        });
+        self.BargainingUnitLabel = ko.computed(function () {
+            var code = "BU: ";
+            if (self.BargainingUnit && self.BargainingUnit.Code) {
+                return code + self.BargainingUnit.Code();
+            }
+            else {
+                return code + "N/A";
+            }
+        });
+    };
+
+    function jobClassStepViewModel(jobClassStepData) {
+        var self = this;
+        ko.mapping.fromJS(jobClassStepData, {}, self);
+
+        self.HourlyLabel = ko.computed(function () {
+            return self.HourlyRate().toFixed(2);
+        });
+
+        self.BiWeeklyLabel = ko.computed(function () {
+            return self.BiWeeklyRate().toFixed(2);
+        });
+
+        self.MonthylLabel = ko.computed(function () {
+            return self.MonthlyRate().toFixed(2);
+        });
+
+        self.AnnualLabel = ko.computed(function () {
+            return self.AnnualRate().toFixed(2);
+        });
+    };
+    
+    var rebind = function (data) {
+        var viewModel = new salaryScheduleViewModel(data);
+
+        $.each(data.BargainingUnits, function (i, e) {
+            viewModel.BargainingUnits.push(e);
+        });
+
+        $.each(data.JobClasses, function (i, e) {
+            viewModel.JobClasses.push(new jobClassViewModel(e));
+        });
+
+        ko.applyBindings(viewModel);
+    };
 
     //the public interface
     this.loadScheduleData = function (filePath) {
@@ -122,11 +112,17 @@
 };
 
 $(function () {
-    var app = new SalaryScheduleApp($("#data"));
+    var app = new SalaryScheduleApp(),
+        $data = $("#data");
 
     $("#submit").on("click", function (e) {
+        e.preventDefault();
+
+        $data.fadeOut();
         var filePath = $("#YearSelect").val();
         app.loadScheduleData(filePath);
-        e.preventDefault();
+        $data.fadeIn();
     });
+
+    $data.hide();
 });

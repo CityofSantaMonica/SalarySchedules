@@ -15,3 +15,5 @@
 thead td { font-weight: bold; }
 
 .table { margin-bottom: 0; }
+
+h3 input[type=text] { margin-left: 1em; padding-left: 5px; font-size: .75em; }
