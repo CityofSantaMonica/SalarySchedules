@@ -1,4 +1,4 @@
-﻿function SalaryScheduleApp() {
+﻿function SalaryScheduleApp($target) {
 
     //knockout view models
 
@@ -65,7 +65,7 @@
             return self.BiWeeklyRate().toFixed(2);
         });
 
-        self.MonthylLabel = ko.computed(function () {
+        self.MonthlyLabel = ko.computed(function () {
             return self.MonthlyRate().toFixed(2);
         });
 
@@ -74,13 +74,24 @@
         });
     };
     
+    function loadComplete(data) {
+        rebind(data);
+        applyMasonry();
+    };
+
     var rebind = function (data) {
+        $target.empty();
+
         var viewModel = new salaryScheduleViewModel(data);
+
+        viewModel.BargainingUnits.extend({ rateLimit: 50 });
+
+        viewModel.JobClasses.extend({ rateLimit: 50 });
 
         $.each(data.BargainingUnits, function (i, e) {
             viewModel.BargainingUnits.push(e);
         });
-
+        
         $.each(data.JobClasses, function (i, e) {
             viewModel.JobClasses.push(new jobClassViewModel(e));
         });
@@ -88,41 +99,65 @@
         ko.applyBindings(viewModel);
     };
 
-    //the public interface
-    this.loadScheduleData = function (filePath) {
-        var args = JSON.stringify({ "file": filePath });
+    var applyMasonry = function () {
+        $target.fadeIn();
 
-        $.ajax({
-            type: "POST",
-            data: args,
-            dataType: "json",
-            url: "SalaryScheduleService.asmx/GetSchedule",
-            contentType: "application/json; charset=utf-8",
-            success: function (data) {
-                if (data.d) data = data.d;
-                rebind(data);
-            },
-            error: function (e) {
-                console.log(e);
-            },
-        });
+        //var $jobClassesTarget = $("div.jobClasses", $target);
+
+        //$jobClassesTarget.masonry("destroy");
+
+        //$jobClassesTarget.prepend(
+        //    $("<div />").addClass("sizer")
+        //);
+
+        //$jobClassesTarget.masonry({
+        //    itemSelector: "div.jobClass"
+        //});
+    };
+
+    var loadedData = {};
+
+    //the public interface
+    
+    this.loadScheduleData = function (filePath) {
+        $target.fadeOut();
+
+        if (loadedData[filePath]) {
+            loadComplete(loadedData[filePath]);
+        }
+        else {
+            var args = JSON.stringify({ "file": filePath });
+
+            $.ajax({
+                type: "POST",
+                data: args,
+                dataType: "json",
+                url: "SalaryScheduleService.asmx/GetSchedule",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.d) data = data.d;
+                    loadedData[filePath] = data;
+                    loadComplete(data);
+                },
+                error: function (e) {
+                    console.log(e);
+                },
+            });
+        }
 
         return false;
     };
 };
 
 $(function () {
-    var app = new SalaryScheduleApp(),
-        $data = $("#data");
+    var $data = $("#data"),
+        app = new SalaryScheduleApp($data);
 
     $("#submit").on("click", function (e) {
         e.preventDefault();
-
-        $data.fadeOut();
         var filePath = $("#YearSelect").val();
         app.loadScheduleData(filePath);
-        $data.fadeIn();
     });
 
-    $data.hide();
+    $data.fadeOut();
 });
