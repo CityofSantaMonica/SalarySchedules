@@ -1,7 +1,7 @@
-﻿using System.Web;
-using System.Web.Services;
-using SalarySchedules.Models;
+﻿using SalarySchedules.Models;
 using SalarySchedules.Parser;
+using System.Web;
+using System.Web.Services;
 
 namespace SalarySchedules.Web
 {
@@ -12,13 +12,13 @@ namespace SalarySchedules.Web
     public class SalaryScheduleService : System.Web.Services.WebService
     {
         [WebMethod]
-        public SalaryScheduleDTO GetSchedule(string file)
+        public SalarySchedule GetSchedule(string file)
         {
             var serverFile = HttpContext.Current.Server.MapPath(string.Format("~/Resources/{0}", file));
             ISalaryScheduleParser parser = new CSMSalaryScheduleParser();
             ISalarySchedule schedule = parser.Process(serverFile);
-            var dto = schedule.ToDTO();
-            return dto;
+            var viewModel = schedule.ToViewModel();
+            return viewModel;
         }
     }
 }

@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SalarySchedules.Models;
 
 namespace SalarySchedules.Web
 {
-    public class SalaryScheduleDTO : ISalarySchedule
+    public class SalarySchedule : Models.ISalarySchedule
     {
         public DateTime? ReportRunDate { get; set; }
-        public FiscalYear FiscalYear { get; set; }
-        public BargainingUnit[] BargainingUnits { get; set; }
-        public JobClassDTO[] JobClasses { get; set; }
+        public Models.FiscalYear FiscalYear { get; set; }
+        public Models.BargainingUnit[] BargainingUnits { get; set; }
+        public JobClass[] JobClasses { get; set; }
 
-        IEnumerable<BargainingUnit> ISalarySchedule.BargainingUnits
+        IEnumerable<Models.BargainingUnit> Models.ISalarySchedule.BargainingUnits
         {
             get
             {
@@ -23,7 +22,7 @@ namespace SalarySchedules.Web
                 BargainingUnits = value.ToArray();
             }
         }
-        IEnumerable<IJobClass> ISalarySchedule.JobClasses
+        IEnumerable<Models.IJobClass> Models.ISalarySchedule.JobClasses
         {
             get
             {
@@ -31,7 +30,7 @@ namespace SalarySchedules.Web
             }
             set
             {
-                JobClasses = value.Select(jc => jc.ToDTO()).ToArray();
+                JobClasses = value.Select(jc => jc.ToViewModel()).ToArray();
             }
         }
     }
