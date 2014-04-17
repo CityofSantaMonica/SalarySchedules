@@ -2,25 +2,39 @@
 
     //knockout view models
 
-    function salaryScheduleViewModel(data) {
-        var self = this;
-        var allJobClasses = $.extend(true, [], data.JobClasses);
+    function salaryScheduleViewModel() {
+        var self = this,
+            $allJobClasses = $([]);
 
-        self.ReportRunDate = ko.observable(data.ReportRunDate);
-        self.FiscalYear = ko.observable(data.FiscalYear);
+        self.BargainingUnits = ko.observableArray().extend({ rateLimit: 50 });
+        self.FiscalYear = ko.observable();        
+        self.JobClasses = ko.observableArray().extend({ rateLimit: 50 });
+        self.ReportRunDate = ko.observable();
+        
         self.FiscalYearLabel = ko.computed(function () {
-            return "FY " + self.FiscalYear().ShortSpanCode;
-        }, self);
-
-        self.BargainingUnits = ko.observableArray();
-
-        self.JobClasses = ko.observableArray();
+            return self.FiscalYear() ? "FY " + self.FiscalYear().ShortSpanCode : "No Fiscal Year";
+        });
+        
         self.FilterByBargainingUnit = function (bu) {
-            var filteredClasses = $(allJobClasses).filter(function () {
-                return !(this.BargainingUnit === undefined || this.BargainingUnit === null)
-                               && (this.BargainingUnit.Code === bu.Code);
+            var filteredClasses = $allJobClasses.filter(function () {
+                return this.BargainingUnit && this.BargainingUnit.Code === bu.Code;
             });
             self.JobClasses(filteredClasses);
+        };
+        
+        self.Initialize = function (data) {
+            $allJobClasses = $($.extend(true, [], data.JobClasses));
+
+            self.ReportRunDate(data.ReportRunDate);
+            self.FiscalYear(data.FiscalYear);
+            
+            $.each(data.BargainingUnits, function (i, e) {
+                self.BargainingUnits.push(e);
+            });
+
+            $.each(data.JobClasses, function (i, e) {
+                self.JobClasses.push(new jobClassViewModel(e));
+            });
         };
     };
 
@@ -35,95 +49,55 @@
         };
 
         ko.mapping.fromJS(jobClassData, mapping, self);
-
-        self.CodeLabel = ko.computed(function () {
-            return "Code: " + self.Code();
-        });
-        self.GradeLabel = ko.computed(function () {
-            return "Grade: " + self.Grade();
-        });
-        self.BargainingUnitLabel = ko.computed(function () {
-            var code = "BU: ";
-            if (self.BargainingUnit && self.BargainingUnit.Code) {
-                return code + self.BargainingUnit.Code();
-            }
-            else {
-                return code + "N/A";
-            }
-        });
     };
 
     function jobClassStepViewModel(jobClassStepData) {
         var self = this;
         ko.mapping.fromJS(jobClassStepData, {}, self);
-
-        self.HourlyLabel = ko.computed(function () {
-            return self.HourlyRate().toFixed(2);
-        });
-
-        self.BiWeeklyLabel = ko.computed(function () {
-            return self.BiWeeklyRate().toFixed(2);
-        });
-
-        self.MonthlyLabel = ko.computed(function () {
-            return self.MonthlyRate().toFixed(2);
-        });
-
-        self.AnnualLabel = ko.computed(function () {
-            return self.AnnualRate().toFixed(2);
-        });
     };
     
-    function loadComplete(data) {
+    function loadComplete(data, callback) {
         rebind(data);
-        applyMasonry();
+        //applyMasonry();
+        if (callback)
+            callback();
+        $target.fadeIn();
     };
 
     var rebind = function (data) {
-        $target.empty();
-
-        var viewModel = new salaryScheduleViewModel(data);
-
-        viewModel.BargainingUnits.extend({ rateLimit: 50 });
-
-        viewModel.JobClasses.extend({ rateLimit: 50 });
-
-        $.each(data.BargainingUnits, function (i, e) {
-            viewModel.BargainingUnits.push(e);
-        });
+        viewModel.Initialize(data);
         
-        $.each(data.JobClasses, function (i, e) {
-            viewModel.JobClasses.push(new jobClassViewModel(e));
-        });
-
-        ko.applyBindings(viewModel);
+        if (!bound) {
+            ko.applyBindings(viewModel);
+            bound = true;
+        }
     };
 
     var applyMasonry = function () {
-        $target.fadeIn();
+        var $jobClassesTarget = $("div.jobClasses", $target);
 
-        //var $jobClassesTarget = $("div.jobClasses", $target);
+        $jobClassesTarget.masonry("destroy");
 
-        //$jobClassesTarget.masonry("destroy");
+        $jobClassesTarget.prepend(
+            $("<div />").addClass("sizer")
+        );
 
-        //$jobClassesTarget.prepend(
-        //    $("<div />").addClass("sizer")
-        //);
-
-        //$jobClassesTarget.masonry({
-        //    itemSelector: "div.jobClass"
-        //});
+        $jobClassesTarget.masonry({
+            itemSelector: "div.jobClass"
+        });
     };
 
-    var loadedData = {};
+    var loadedData = {},
+        viewModel = new salaryScheduleViewModel(),
+        bound = false;
 
     //the public interface
     
-    this.loadScheduleData = function (filePath) {
+    this.loadScheduleData = function (filePath, callback) {
         $target.fadeOut();
 
         if (loadedData[filePath]) {
-            loadComplete(loadedData[filePath]);
+            loadComplete(loadedData[filePath], callback);
         }
         else {
             var args = JSON.stringify({ "file": filePath });
@@ -137,7 +111,7 @@
                 success: function (data) {
                     if (data.d) data = data.d;
                     loadedData[filePath] = data;
-                    loadComplete(data);
+                    loadComplete(data, callback);
                 },
                 error: function (e) {
                     console.log(e);
@@ -150,14 +124,21 @@
 };
 
 $(function () {
-    var $data = $("#data"),
-        app = new SalaryScheduleApp($data);
-
+    var $dataContainer = $("#data"),
+        $loader = $("#loader"),
+        $jobCarets = $(".jobClass h4 .caret");
+        app = new SalaryScheduleApp($dataContainer);
+    
     $("#submit").on("click", function (e) {
+        $loader.show();
         e.preventDefault();
         var filePath = $("#YearSelect").val();
-        app.loadScheduleData(filePath);
+        app.loadScheduleData(filePath, function () {
+            window.setTimeout(function () { $loader.hide(); }, 250);            
+        });
     });
 
-    $data.fadeOut();
+    $jobCarets.parent().on("click", function () {
+        $(this).next(".body").slideToggle();
+    });
 });

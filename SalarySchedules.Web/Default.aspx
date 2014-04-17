@@ -53,9 +53,9 @@
                     <div class="jobClass">
                         <h4 data-bind="text: Title"></h4>
                         <div class="description">
-                            <span class="code" data-bind="text: CodeLabel"></span>
-                            <span class="grade" data-bind="text: GradeLabel"></span>
-                            <span class="bargainingUnit" data-bind="text: BargainingUnitLabel"></span>
+                            <span class="code" data-bind="text: Code"></span>
+                            <span class="grade" data-bind="text: Grade"></span>
+                            <span class="bargainingUnit" data-bind="text: BargainingUnit.Code"></span>
                         </div>
 
                         <div class="steps">
