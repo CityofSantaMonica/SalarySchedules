@@ -17,7 +17,11 @@
             <asp:Label ID="YearLabel" runat="server" Text="Select a fiscal year: "></asp:Label>            
             <asp:DropDownList ID="YearSelect" runat="server" AutoPostBack="false" ClientIDMode="Static"></asp:DropDownList>
             <button id="submit">Load Data</button>
-
+            
+            <div id="loader">
+                <img src="/img/loader.gif" alt="Loading..." />
+            </div>
+            
             <div id="data">
                 <h3 data-bind="text: FiscalYearLabel"></h3>
                 
@@ -31,14 +35,20 @@
                     </thead>
                     <tbody data-bind="foreach: BargainingUnits">
                         <tr>
-                            <td class="code"><a href="#" data-bind="click: $parent.FilterByBargainingUnit"><span data-bind="    text: Code"></span></a></td>
+                            <td class="code">
+                                <a href="#" data-bind="click: $parent.FilterByBargainingUnit">
+                                    <span data-bind="text: Code"></span>
+                                </a>
+                            </td>
                             <td class="name" data-bind="text: Name"></td>
                         </tr>
                     </tbody>
                 </table>
                 
-                <h3 class="jobClasses">Job Classes</h3>                
-                <input type="text" id="search" placeholder="Search Job Classes" />                
+                <h3 class="jobClasses">Job Classes</h3>
+
+                <%--<input type="text" id="search" class="glyphicon-search" placeholder="Search Job Classes" data-bind="value: TitleFilter, valueUpdate: 'input'" />--%>
+
                 <div class="jobClasses" data-bind="foreach: JobClasses">
                     <div class="jobClass">
                         <h4 data-bind="text: Title"></h4>
@@ -47,22 +57,25 @@
                             <span class="grade" data-bind="text: GradeLabel"></span>
                             <span class="bargainingUnit" data-bind="text: BargainingUnitLabel"></span>
                         </div>
+
                         <div class="steps">
                             <table class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
+                                        <th>Step</th>
                                         <th>Hourly</th>
                                         <th>BiWeekly</th>
                                         <th>Monthly</th>
-                                        <th>Annually</th>
+                                        <th>Annual</th>
                                     </tr>
                                 </thead>
                                 <tbody data-bind="foreach: Steps">
                                     <tr class="step">
-                                        <td class="hourly rate" data-bind="text: HourlyLabel"></td>
-                                        <td class="biweekly rate" data-bind="text: BiWeeklyLabel"></td>
-                                        <td class="monthly rate" data-bind="text: MonthlyLabel"></td>
-                                        <td class="annual rate" data-bind="text: AnnualLabel"></td>
+                                        <td class="step" data-bind="text: StepNumber"></td>
+                                        <td class="hourly rate" data-bind="text: HourlyRate"></td>
+                                        <td class="biweekly rate" data-bind="text: BiWeeklyRate"></td>
+                                        <td class="monthly rate" data-bind="text: MonthlyRate"></td>
+                                        <td class="annual rate" data-bind="text: AnnualRate"></td>
                                     </tr>
                                 </tbody>
                             </table>
