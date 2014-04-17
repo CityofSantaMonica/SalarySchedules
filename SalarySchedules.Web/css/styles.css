@@ -1,6 +1,8 @@
-﻿.jobClasses .sizer { width: 21%; }
+﻿#data, #loader { display: none; }
 
-.jobClass { border: solid 1px #efefef; margin-bottom: 10px; width: 350px; }
+#loader { margin-left: -260px; }
+
+.jobClass { border: solid 1px #efefef; margin-bottom: 16px; width: 100%; }
 
 .jobClass div.description { padding-left: 10px; }
 
@@ -8,12 +10,33 @@
 
 .jobClass span { float: left; margin-right: 1em; font-weight: bold; }
 
-.jobClass .steps { clear: left; padding-top: 10px; }
+.jobClass h4 span { float: none; }
 
-.jobClass .steps .rate::before { content: '$'; }
+.jobClass .body { display: none; }
+
+.jobClass .code:before { content: "Code: "; }
+
+.jobClass .grade:before { content: "Grade: "; }
+
+.jobClass .bargainingUnit:before { content: "BU: "; }
+
+.jobClass .steps { clear: left; padding-top: 10px; }
 
 thead td { font-weight: bold; }
 
 .table { margin-bottom: 0; }
 
-h3 input[type=text] { margin-left: 1em; padding-left: 5px; font-size: .75em; }
+#search { margin-bottom: 1em; padding-left: 5px; }
+
+@media screen and (min-width: 768px) {
+    .jobClass { width: 370px; float: left; }
+        .jobClass:nth-of-type(odd) { clear: left; margin-right: 16px; }
+}
+
+@media screen and (min-width: 1024px) {
+    .jobClass:nth-of-type(odd),
+    .jobClass:nth-of-type(4n+1) { clear: none; }
+    .jobClass:nth-of-type(4n) { margin-right: 0; }
+    .jobClass { margin-right: 16px; }
+
+}
