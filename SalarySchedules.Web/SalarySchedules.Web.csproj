@@ -54,7 +54,6 @@
     <Content Include="img\glyphicons-halflings-white.png" />
     <Content Include="img\glyphicons-halflings.png" />
     <Content Include="img\loader.gif" />
-    <Content Include="js\masonry.pkgd.min.js" />
     <Content Include="js\salarySchedules.js" />
     <Content Include="SalaryScheduleService.asmx" />
     <Content Include="Web.config" />

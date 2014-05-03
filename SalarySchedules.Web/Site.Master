@@ -10,14 +10,13 @@
 </head>
 <body>
     <form id="Form" runat="server">
-    <div class="container-fluid">
+    <div class="container">
         <asp:ContentPlaceHolder ID="MainContentPlaceHolder" runat="server">
         
         </asp:ContentPlaceHolder>
     </div>
     </form>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <asp:ContentPlaceHolder ID="ScriptContentPlaceHolder" runat="server"></asp:ContentPlaceHolder>
 </body>
 </html>
