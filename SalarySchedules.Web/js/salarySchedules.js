@@ -10,18 +10,39 @@
         self.FiscalYear = ko.observable();        
         self.JobClasses = ko.observableArray().extend({ rateLimit: 50 });
         self.ReportRunDate = ko.observable();
+        self.TitleFilter = ko.observable();
+        self.BargainingUnitsFilter = ko.observable();
+
+        self.FilteredJobClasses = ko.computed(function () {
+            var title = self.TitleFilter() || "",
+                bu = self.BargainingUnitsFilter() || "";
+
+            if (title || bu) {
+                return ko.utils.arrayFilter(self.JobClasses(), function (jc) {
+                    var keep = true;
+                    
+                    if (title)
+                        keep = keep && (jc.Title().toLowerCase().indexOf(title.toLowerCase()) > -1);
+
+                    if (bu)
+                        keep = keep && (jc.BargainingUnit && jc.BargainingUnit.Code && jc.BargainingUnit.Code() && jc.BargainingUnit.Code().toLowerCase() === bu.toLowerCase());
+
+                    return keep;
+                });
+            }
+            else {
+                return self.JobClasses();
+            }
+        });
         
         self.FiscalYearLabel = ko.computed(function () {
             return self.FiscalYear() ? "FY " + self.FiscalYear().ShortSpanCode : "No Fiscal Year";
         });
         
         self.FilterByBargainingUnit = function (bu) {
-            var filteredClasses = $allJobClasses.filter(function () {
-                return this.BargainingUnit && this.BargainingUnit.Code === bu.Code;
-            });
-            self.JobClasses(filteredClasses);
-        };
-        
+            self.BargainingUnitsFilter(bu.Code || "");
+        };        
+       
         self.Initialize = function (data) {
             $allJobClasses = $($.extend(true, [], data.JobClasses));
 
@@ -140,5 +161,9 @@ $(function () {
 
     $jobCarets.parent().on("click", function () {
         $(this).next(".body").slideToggle();
+    });
+
+    $("td.code a").on("click", function () {
+        $(this).parent("tr").addClass("selected");
     });
 });

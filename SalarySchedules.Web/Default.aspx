@@ -47,9 +47,9 @@
                 
                 <h3 class="jobClasses">Job Classes</h3>
 
-                <%--<input type="text" id="search" class="glyphicon-search" placeholder="Search Job Classes" data-bind="value: TitleFilter, valueUpdate: 'input'" />--%>
+                <input type="text" id="search" placeholder="Filter Job Classes" data-bind="value: TitleFilter, valueUpdate: 'input'" />
 
-                <div class="jobClasses" data-bind="foreach: JobClasses">
+                <div class="jobClasses" data-bind="foreach: FilteredJobClasses">
                     <div class="jobClass">
                         <h4 data-bind="text: Title"></h4>
                         <div class="description">
@@ -59,10 +59,10 @@
                         </div>
 
                         <div class="steps">
-                            <table class="table table-striped table-bordered">
+                            <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Step</th>
+                                        <th class="step">Step</th>
                                         <th>Hourly</th>
                                         <th>BiWeekly</th>
                                         <th>Monthly</th>
@@ -88,7 +88,6 @@
 </asp:Content>
 
 <asp:Content ID="ScriptContent" runat="server" ContentPlaceHolderID="ScriptContentPlaceHolder">
-    <script src="js/masonry.pkgd.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.js"></script>
     <script src="js/salarySchedules.js"></script>
