@@ -46,9 +46,13 @@
             self.ReportRunDate(data.ReportRunDate);
             self.FiscalYear(data.FiscalYear);
             
+            self.BargainingUnits([]);
+
             $.each(data.BargainingUnits, function (i, e) {
                 self.BargainingUnits.push(e);
             });
+
+            self.JobClasses([]);
 
             $.each(data.JobClasses, function (i, e) {
                 self.JobClasses.push(new jobClassViewModel(e));
