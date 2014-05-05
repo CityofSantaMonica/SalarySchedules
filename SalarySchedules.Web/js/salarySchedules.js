@@ -57,6 +57,9 @@
             $.each(data.JobClasses, function (i, e) {
                 self.JobClasses.push(new jobClassViewModel(e));
             });
+
+            self.TitleFilter("");
+            self.BargainingUnitsFilter("");
         };
     };
 
