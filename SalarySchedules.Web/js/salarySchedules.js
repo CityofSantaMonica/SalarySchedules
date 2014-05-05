@@ -3,8 +3,7 @@
     //knockout view models
 
     function salaryScheduleViewModel() {
-        var self = this,
-            $allJobClasses = $([]);
+        var self = this;
 
         self.BargainingUnits = ko.observableArray().extend({ rateLimit: 50 });
         self.FiscalYear = ko.observable();        
@@ -44,8 +43,6 @@
         };        
        
         self.Initialize = function (data) {
-            $allJobClasses = $($.extend(true, [], data.JobClasses));
-
             self.ReportRunDate(data.ReportRunDate);
             self.FiscalYear(data.FiscalYear);
             
@@ -79,9 +76,10 @@
     
     function loadComplete(data, callback) {
         rebind(data);
-        //applyMasonry();
+        
         if (callback)
             callback();
+
         $target.fadeIn();
     };
 
@@ -92,20 +90,6 @@
             ko.applyBindings(viewModel);
             bound = true;
         }
-    };
-
-    var applyMasonry = function () {
-        var $jobClassesTarget = $("div.jobClasses", $target);
-
-        $jobClassesTarget.masonry("destroy");
-
-        $jobClassesTarget.prepend(
-            $("<div />").addClass("sizer")
-        );
-
-        $jobClassesTarget.masonry({
-            itemSelector: "div.jobClass"
-        });
     };
 
     var loadedData = {},
@@ -147,7 +131,6 @@
 $(function () {
     var $dataContainer = $("#data"),
         $loader = $("#loader"),
-        $jobCarets = $(".jobClass h4 .caret");
         app = new SalaryScheduleApp($dataContainer);
     
     $("#submit").on("click", function (e) {
@@ -157,10 +140,6 @@ $(function () {
         app.loadScheduleData(filePath, function () {
             window.setTimeout(function () { $loader.hide(); }, 250);            
         });
-    });
-
-    $jobCarets.parent().on("click", function () {
-        $(this).next(".body").slideToggle();
     });
 
     $("td.code a").on("click", function () {
