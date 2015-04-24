@@ -25,11 +25,11 @@ namespace SalarySchedules.Models
 
         public FiscalYear(string startValue, string endValue)
         {
-            string start = String.Format("07/01/{0}", startValue);
-            string end = String.Format("06/30/{0}", endValue);
+            startValue = startValue.Length == 2 ? String.Format("20{0}", startValue) : startValue;
+            endValue = endValue.Length == 2 ? String.Format("20{0}", endValue) : endValue;
 
-            StartDate = DateTime.Parse(start);
-            EndDate = DateTime.Parse(end);
+            StartDate = new DateTime(Int16.Parse(startValue), 7, 1, 0, 0, 0, DateTimeKind.Local);
+            EndDate = new DateTime(Int16.Parse(endValue), 6, 30, 11, 59, 59, DateTimeKind.Local);
         }
     }
 }

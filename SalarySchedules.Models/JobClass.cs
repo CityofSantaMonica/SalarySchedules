@@ -8,7 +8,7 @@ namespace SalarySchedules.Models
         public string Title { get; set; }
         public string Code { get; set; }
         public string Grade { get; set; }
-        public BargainingUnit BargainingUnit { get; set; }        
+        public BargainingUnit BargainingUnit { get; set; }
         public IEnumerable<JobClassStep> Steps { get; set; }
     }
 }

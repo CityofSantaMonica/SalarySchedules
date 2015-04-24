@@ -1,8 +1,8 @@
-﻿using System.IO;
-using System.Web.Script.Serialization;
+﻿using System;
+using System.IO;
+using Newtonsoft.Json;
 using SalarySchedules.Models;
 using SalarySchedules.Parser;
-using System;
 
 namespace SalarySchedules.App
 {
@@ -16,14 +16,13 @@ namespace SalarySchedules.App
             }
 
             ISalaryScheduleParser parser = new CSMSalaryScheduleParser();
-            JavaScriptSerializer serializer = new JavaScriptSerializer(); 
 
             foreach (var file in args)
             {
                 try
                 {
                     ISalarySchedule schedule = parser.Process(file);
-                    string json = serializer.Serialize(schedule);
+                    string json = JsonConvert.SerializeObject(schedule);
                     File.WriteAllText(file.Replace(".pdf", ".json"), json);
                 }
                 catch

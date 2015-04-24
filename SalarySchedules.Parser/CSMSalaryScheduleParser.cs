@@ -13,7 +13,7 @@ namespace SalarySchedules.Parser
     public class CSMSalaryScheduleParser : ISalaryScheduleParser
     {
         Dictionary<string, BargainingUnit> bargainingUnits;
-        
+
         /// <summary>
         /// Process a Salary Schedule Report PDF.
         /// </summary>
@@ -37,7 +37,7 @@ namespace SalarySchedules.Parser
 
             return schedule;
         }
-        
+
         /// <summary>
         /// Get a collection of normalized page data for each page in a file.
         /// </summary>
@@ -61,7 +61,7 @@ namespace SalarySchedules.Parser
         /// </summary>
         private IEnumerable<IEnumerable<string>> getAlignmentCorrectedClassData(PdfReader reader)
         {
-            return 
+            return
                 Enumerable.Range(2, reader.NumberOfPages - 1)
                           .Select(n => reader.TextFromPage(n))
                           .Select(page => getPageChunks(page))
@@ -223,7 +223,7 @@ namespace SalarySchedules.Parser
         IEnumerable<JobClass> processClassesOnPage(IEnumerable<string> page)
         {
             var jobClasses = new List<JobClass>();
-            
+
             //to process the chunks sequentially (considering more than one at a time)
             var queue = new Queue<string>(page);
 
@@ -232,7 +232,7 @@ namespace SalarySchedules.Parser
                 var jobClass = new JobClass();
                 var steps = new List<JobClassStep>();
                 var currentStep = new JobClassStep();
-                
+
                 IEnumerable<string> dataChunks = queue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
                 //assign the title, code, bargaining unit, grade for this class
@@ -244,7 +244,7 @@ namespace SalarySchedules.Parser
                     currentStep = assignStepData(dataChunks);
                     steps.Add(currentStep);
                 }
-                    
+
                 //add each subsequent step for this class
                 while (queue.Any() && queue.Peek().StartsWith(jobClass.Grade))
                 {
@@ -267,7 +267,7 @@ namespace SalarySchedules.Parser
         /// <param name="jobClass">A JobClass object to consume the line data.</param>
         /// <returns>Any remaining data after processing the JobClass.</returns>
         IEnumerable<string> assignClassData(IList<string> dataChunks, JobClass jobClass)
-        {            
+        {
             //the process order here is important, since we're relying on simple(ish) Regex 
             //which may overlap one another
 
@@ -314,7 +314,7 @@ namespace SalarySchedules.Parser
             //the job step chunks are all that should remain
             return dataChunks;
         }
-        
+
         /// <summary>
         /// Consumes a line of data to populate a JobClassStep
         /// </summary>
