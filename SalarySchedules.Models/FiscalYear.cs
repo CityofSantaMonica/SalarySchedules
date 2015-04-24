@@ -28,8 +28,8 @@ namespace SalarySchedules.Models
             startValue = startValue.Length == 2 ? String.Format("20{0}", startValue) : startValue;
             endValue = endValue.Length == 2 ? String.Format("20{0}", endValue) : endValue;
 
-            StartDate = new DateTime(Int16.Parse(startValue), 7, 1, 0, 0, 0, DateTimeKind.Local);
-            EndDate = new DateTime(Int16.Parse(endValue), 6, 30, 11, 59, 59, DateTimeKind.Local);
+            StartDate = new DateTime(Int16.Parse(startValue), 7, 1, 0, 0, 0, DateTimeKind.Unspecified);
+            EndDate = new DateTime(Int16.Parse(endValue), 6, 30, 11, 59, 59, DateTimeKind.Unspecified);
         }
     }
 }

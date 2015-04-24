@@ -29,7 +29,7 @@ namespace SalarySchedules.Models.Tests
         }
 
         [Test]
-        public void FiscalYear_Starts_July1MidnightLocal()
+        public void FiscalYear_Starts_July1Midnight()
         {
             var fiscalYear = new FiscalYear(start, end);
             var startDate = fiscalYear.StartDate.Value;
@@ -39,11 +39,10 @@ namespace SalarySchedules.Models.Tests
             Assert.AreEqual(0, startDate.Hour);
             Assert.AreEqual(0, startDate.Minute);
             Assert.AreEqual(0, startDate.Second);
-            Assert.AreEqual(DateTimeKind.Local, startDate.Kind);
         }
 
         [Test]
-        public void FiscalYear_Ends_BeforeJuly1MidnightLocal()
+        public void FiscalYear_Ends_BeforeJuly1Midnight()
         {
             var fiscalYear = new FiscalYear(start, end);
             var endDate = fiscalYear.EndDate.Value;
@@ -53,7 +52,6 @@ namespace SalarySchedules.Models.Tests
             Assert.AreEqual(11, endDate.Hour);
             Assert.AreEqual(59, endDate.Minute);
             Assert.AreEqual(59, endDate.Second);
-            Assert.AreEqual(DateTimeKind.Local, endDate.Kind);
         }
     }
 }
