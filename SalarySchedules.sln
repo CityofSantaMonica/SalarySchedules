@@ -1,11 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalarySchedules.App", "SalarySchedules.App\SalarySchedules.App.csproj", "{43F50D5E-A1E0-4C32-A666-986FECB9EFD4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalarySchedules.Parser", "SalarySchedules.Parser\SalarySchedules.Parser.csproj", "{363C1F0E-92CD-40CF-BCAF-4D945193C145}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalarySchedules.Models", "SalarySchedules.Models\SalarySchedules.Models.csproj", "{6893B4A0-74A7-48F7-9E5A-04E143E34AC1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B23FF1BE-E062-43D8-B404-D91CC779E404}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
