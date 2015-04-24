@@ -6,6 +6,6 @@
         public decimal? HourlyRate { get; set; }
         public decimal? BiWeeklyRate { get; set; }
         public decimal? MonthlyRate { get; set; }
-        public decimal? AnnualRate { get; set; }        
+        public decimal? AnnualRate { get; set; }
     }
 }
