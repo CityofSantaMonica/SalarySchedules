@@ -171,7 +171,12 @@ namespace SalarySchedules.Parser
 
             if (FieldPatterns.RunDate.IsMatch(text))
             {
-                DateTime.TryParse(FieldPatterns.RunDate.Match(text).Groups[1].Value.Trim(), out reportDate);
+                var match = FieldPatterns.RunDate.Match(text);
+                var group = String.IsNullOrEmpty(match.Groups[1].Value) && match.Groups.Count > 2
+                    ? match.Groups[2]
+                    : match.Groups[1];
+
+                DateTime.TryParse(group.Value.Trim(), out reportDate);
             }
 
             if (reportDate != DateTime.MinValue)

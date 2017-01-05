@@ -8,7 +8,7 @@ namespace SalarySchedules.Parser
             new Regex(@"fiscal\s+year\s+(\d{2})/(\d{2})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static Regex RunDate = 
-            new Regex(@"run date: (\d{1,2}/\d{1,2}/\d{2,4})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            new Regex(@"run date: (\d{1,2}/\d{1,2}/\d{2,4})|(\d{1,2}/\d{1,2}/\d{2,4})\srun date:", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static Regex DataHeader = 
             new Regex(@"Class Title Class Code BU Grade Step Hourly Rate Monthly Rate Annual Rate Bi-Weekly Rate", RegexOptions.Compiled);
