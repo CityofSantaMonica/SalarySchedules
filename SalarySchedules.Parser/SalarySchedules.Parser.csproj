@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
-    <Compile Include="FieldPatterns.cs" />
+    <Compile Include="Patterns.cs" />
     <Compile Include="ISalaryScheduleParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CSMSalaryScheduleParser.cs" />
