@@ -113,7 +113,12 @@ namespace SalarySchedules.Parser
         {
             string replace = " ";
             List<string> final = new List<string>();
-            Queue<string> queue = new Queue<string>(chunks);
+
+            var dataChunks = chunks.Any(c => FieldPatterns.DataHeader.IsMatch(c))
+                ? chunks.SkipWhile(c => !FieldPatterns.DataHeader.IsMatch(c)).Skip(1)
+                : chunks;
+
+            Queue<string> queue = new Queue<string>(dataChunks);
             
             while (queue.Any())
             {
