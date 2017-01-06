@@ -12,11 +12,16 @@ namespace SalarySchedules.App
         static void Main(string[] args)
         {
             var files = args.Where(a => a.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase));
+            bool pretty = args.Contains("/p");
 
             if (!files.Any())
             {
                 Console.WriteLine("USAGE:");
-                Console.WriteLine("\tSalarySchedules file1.pdf [file2.pdf file3.pdf fileN.pdf]");
+                Console.WriteLine("\tSalarySchedules [OPTIONS] file1.pdf [file2.pdf file3.pdf fileN.pdf]");
+                Console.WriteLine();
+                Console.WriteLine("\tOPTIONS:");
+                Console.WriteLine("\t\t /p Pretty print JSON");
+                Console.WriteLine();
                 return;
             }
 
@@ -28,7 +33,7 @@ namespace SalarySchedules.App
                 {
                     Console.Write("Processing file {0}... ", file);
                     ISalarySchedule schedule = parser.Process(file);
-                    string json = JsonConvert.SerializeObject(schedule);
+                    string json = JsonConvert.SerializeObject(schedule, pretty ? Formatting.Indented : Formatting.None);
                     File.WriteAllText(file.Replace(".pdf", ".json"), json);
                     Console.WriteLine("Finished");
                 }
