@@ -32,5 +32,10 @@ namespace SalarySchedules.Parser
             new Regex(@"((?<= )|(?<!.))[1-5]((?= )|(?!.))", RegexOptions.Compiled);
 
         public static Regex ConsecutiveSpaces = new Regex(@"\s{2,}");
+
+        public static Regex StartsWithWord(string word)
+        {
+            return new Regex("^" + word + "\\s");
+        }
     }
 }

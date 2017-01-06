@@ -256,7 +256,7 @@ namespace SalarySchedules.Parser
                 }
 
                 //add each subsequent step for this class
-                while (queue.Any() && queue.Peek().StartsWith(jobClass.Grade))
+                while (queue.Any() && FieldPatterns.StartsWithWord(jobClass.Grade).IsMatch(queue.Peek()))
                 {
                     dataChunks = queue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Skip(1);
                     currentStep = assignStepData(dataChunks);
