@@ -61,12 +61,14 @@ namespace SalarySchedules.Parser
         /// </summary>
         private IEnumerable<IEnumerable<string>> getAlignmentCorrectedClassData(PdfReader reader)
         {
-            return
-                Enumerable.Range(2, reader.NumberOfPages - 1)
-                          .Select(n => reader.TextFromPage(n))
-                          .Select(page => getPageChunks(page))
-                          .Select(chunks => fixAlignment(chunks))
-                          .ToArray();
+            for (int n = 2; n <= reader.NumberOfPages; n++)
+            {
+                var text = reader.TextFromPage(n);
+                var chunks = getPageChunks(text);
+                var fixedChunks = fixAlignment(chunks);
+
+                yield return fixedChunks;
+            }
         }
 
         /// <summary>
@@ -80,8 +82,8 @@ namespace SalarySchedules.Parser
             IEnumerable<string> chunks = page.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             //skip the header rows when starting a new page
-            if (FieldPatterns.RunDate.IsMatch(chunks.First()))
-                chunks = chunks.SkipWhile(s => !FieldPatterns.DataHeader.IsMatch(s)).Skip(1);
+            if (Patterns.RunDate.IsMatch(chunks.First()))
+                chunks = chunks.SkipWhile(s => !Patterns.DataHeader.IsMatch(s)).Skip(1);
 
             return chunks;
         }
@@ -113,28 +115,33 @@ namespace SalarySchedules.Parser
         {
             string replace = " ";
             List<string> final = new List<string>();
-            Queue<string> queue = new Queue<string>(chunks);
+
+            var dataChunks = chunks.Any(c => Patterns.DataHeader.IsMatch(c))
+                ? chunks.SkipWhile(c => !Patterns.DataHeader.IsMatch(c)).Skip(1)
+                : chunks;
+
+            Queue<string> queue = new Queue<string>(dataChunks);
             
             while (queue.Any())
             {
-                string current = FieldPatterns.ConsecutiveSpaces.Replace(queue.Dequeue(), replace).Trim();
+                string current = Patterns.ConsecutiveSpaces.Replace(queue.Dequeue(), replace).Trim();
 
                 if (queue.Any())
                 {
                     string next = queue.Peek().Trim();
 
-                    if (FieldPatterns.ClassCode.IsMatch(current) && FieldPatterns.ClassTitle.IsMatch(next))
+                    if (Patterns.ClassCode.IsMatch(current) && Patterns.ClassTitle.IsMatch(next))
                     {
-                        current += " " + FieldPatterns.ConsecutiveSpaces.Replace(queue.Dequeue(), replace).Trim();
+                        current += " " + Patterns.ConsecutiveSpaces.Replace(queue.Dequeue(), replace).Trim();
                     }
-                    else if (FieldPatterns.Grade.IsMatch(current) && FieldPatterns.Rate.IsMatch(next)
-                         && !FieldPatterns.Grade.IsMatch(next) && !FieldPatterns.ClassCode.IsMatch(next))
+                    else if (Patterns.Grade.IsMatch(current) && Patterns.Rate.IsMatch(next)
+                         && !Patterns.Grade.IsMatch(next) && !Patterns.ClassCode.IsMatch(next))
                     {
-                        current += " " + FieldPatterns.ConsecutiveSpaces.Replace(queue.Dequeue(), replace).Trim();
+                        current += " " + Patterns.ConsecutiveSpaces.Replace(queue.Dequeue(), replace).Trim();
                     }
                 }
 
-                final.Add(current.Replace(" -", "-").Replace("- ", "-"));
+                final.Add(Patterns.DashAndSpace.Replace(current, "-"));
             }
 
             return final;
@@ -150,9 +157,9 @@ namespace SalarySchedules.Parser
 
             var text = reader.TextFromPage(1);
 
-            if (FieldPatterns.FiscalYear.IsMatch(text))
+            if (Patterns.FiscalYear.IsMatch(text))
             {
-                var match = FieldPatterns.FiscalYear.Match(text);
+                var match = Patterns.FiscalYear.Match(text);
                 fiscalYear = new FiscalYear(match.Groups[1].Value, match.Groups[2].Value);
             }
 
@@ -169,9 +176,14 @@ namespace SalarySchedules.Parser
 
             var text = reader.TextFromPage(2);
 
-            if (FieldPatterns.RunDate.IsMatch(text))
+            if (Patterns.RunDate.IsMatch(text))
             {
-                DateTime.TryParse(FieldPatterns.RunDate.Match(text).Groups[1].Value.Trim(), out reportDate);
+                var match = Patterns.RunDate.Match(text);
+                var group = String.IsNullOrEmpty(match.Groups[1].Value) && match.Groups.Count > 2
+                    ? match.Groups[2]
+                    : match.Groups[1];
+
+                DateTime.TryParse(group.Value.Trim(), out reportDate);
             }
 
             if (reportDate != DateTime.MinValue)
@@ -191,16 +203,16 @@ namespace SalarySchedules.Parser
             //the Fire BU is never output as a code in the BU table?
             var text = reader.TextFromPage(1).Replace("Fire ", "FIR ");
             //get all the BU chunks
-            var chunks = getPageChunks(text).Where(c => FieldPatterns.BargainingUnit.IsMatch(c));
+            var chunks = getPageChunks(text).Where(c => Patterns.BargainingUnit.IsMatch(c));
             
             foreach (var chunk in chunks)
             {
                 //get each of the BUs in this chunk
-                var matches = FieldPatterns.BargainingUnit.Matches(chunk);
+                var matches = Patterns.BargainingUnit.Matches(chunk);
                 //split the chunk at the BU code points (leaving their names)
-                var names = FieldPatterns.BargainingUnit.Split(chunk)
+                var names = Patterns.BargainingUnit.Split(chunk)
                                                         .Where(s => !String.IsNullOrEmpty(s.Trim()))
-                                                        .Select(s => FieldPatterns.ConsecutiveSpaces.Replace(s, replace).Trim());
+                                                        .Select(s => Patterns.ConsecutiveSpaces.Replace(s, replace).Trim());
                 for (int i = 0; i < matches.Count; i++)
                 {
                     var match = matches[i];
@@ -224,7 +236,7 @@ namespace SalarySchedules.Parser
         {
             var jobClasses = new List<JobClass>();
 
-            //to process the chunks sequentially (considering more than one at a time)
+            //process chunks sequentially, considering more than one at a time
             var queue = new Queue<string>(page);
 
             while (queue.Any())
@@ -233,23 +245,24 @@ namespace SalarySchedules.Parser
                 var steps = new List<JobClassStep>();
                 var currentStep = new JobClassStep();
 
-                IEnumerable<string> dataChunks = queue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                var dataChunks = queue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
                 //assign the title, code, bargaining unit, grade for this class
-                dataChunks = assignClassData(dataChunks.ToList(), jobClass);
-                
+                //return any remaining chunks
+                var remainingChunks = assignClassData(dataChunks.ToList(), jobClass);
+
                 //if there is leftover data -> step definition
-                if (dataChunks.Any())
+                if (remainingChunks.Any())
                 {
-                    currentStep = assignStepData(dataChunks);
+                    currentStep = assignStepData(remainingChunks);
                     steps.Add(currentStep);
                 }
 
                 //add each subsequent step for this class
-                while (queue.Any() && queue.Peek().StartsWith(jobClass.Grade))
+                while (queue.Any() && Patterns.StartsWithWord(jobClass.Grade).IsMatch(queue.Peek()))
                 {
-                    dataChunks = queue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Skip(1);
-                    currentStep = assignStepData(dataChunks);
+                    remainingChunks = queue.Dequeue().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Skip(1);
+                    currentStep = assignStepData(remainingChunks);
                     steps.Add(currentStep);
                 }
 
@@ -272,21 +285,21 @@ namespace SalarySchedules.Parser
             //which may overlap one another
 
             // 1. code is always 4 consecutive integers
-            string code = dataChunks.FirstOrDefault(c => FieldPatterns.ClassCode.IsMatch(c));
+            string code = dataChunks.FirstOrDefault(c => Patterns.ClassCode.IsMatch(c));
             if (!String.IsNullOrEmpty(code))
             {
                 jobClass.Code = code;
                 dataChunks.Remove(code);
             }
             // 2. grade is always 3 consecutive integers
-            string grade = dataChunks.FirstOrDefault(c => FieldPatterns.Grade.IsMatch(c));
+            string grade = dataChunks.FirstOrDefault(c => Patterns.Grade.IsMatch(c));
             if (!String.IsNullOrEmpty(grade))
             {
                 jobClass.Grade = grade;
                 dataChunks.Remove(grade);
             }
             // 3. bargaining unit code is always 3 consecutive capital letters
-            string bu = dataChunks.FirstOrDefault(c => FieldPatterns.BargainingUnit.IsMatch(c));
+            string bu = dataChunks.FirstOrDefault(c => Patterns.BargainingUnit.IsMatch(c));
             if (!String.IsNullOrEmpty(bu))
             {
                 jobClass.BargainingUnit =
@@ -328,7 +341,7 @@ namespace SalarySchedules.Parser
             {
                 //convert to numeric and order increasing
                 var numberChunks = dataChunks.Select(d => decimal.Parse(d)).OrderBy(d => d).ToArray();
-                step.StepNumber = (int)numberChunks[0];                
+                step.StepNumber = (int)numberChunks[0];
                 step.HourlyRate = numberChunks[1];
                 step.BiWeeklyRate = numberChunks[2];
                 step.MonthlyRate = numberChunks[3];
@@ -338,7 +351,7 @@ namespace SalarySchedules.Parser
             {
                 throw new InvalidOperationException(String.Format("Couldn't parse step data: {0}", String.Join(" ", dataChunks)));
             }
-                        
+
             return step;
         }
     }
